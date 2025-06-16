@@ -1273,7 +1273,7 @@ variable "front_door_origins" {
   - `weight` - (Optional) The weight of the origin in a given origin group for load balancing. Must be between 1 and 1000. Defaults to 500.
   - `private_link` - (Optional) A private_link block as defined below:-
       - `request_message` - (Optional) Specifies the request message that will be submitted to the private_link_target_id when requesting the private link endpoint connection. Values must be between 1 and 140 characters in length. Defaults to Access request for CDN FrontDoor Private Link Origin.
-      - `target_type` - (Optional) Specifies the type of target for this Private Link Endpoint. Possible values are blob, blob_secondary, web and sites.
+      - `target_type` - (Optional) Specifies the type of target for this Private Link Endpoint. Possible values are `blob`, `blob_secondary`, `web`, `sites`, `Gateway`, `managedEnvironments` and `web_secondary`.
       - `location` - (Required) Specifies the location where the Private Link resource should exist. Changing this forces a new resource to be created.
       - `private_link_target_id` - (Required) Specifies the ID of the Private Link resource to connect to.
   
@@ -1355,12 +1355,12 @@ variable "front_door_origins" {
       [
         for _, v in var.front_door_origins : v["private_link"] == null ? true : alltrue(
           [
-            for _, x in v["private_link"] : x["target_type"] == null ? true : contains(["blob", "blob_secondary", "web", "sites"], x["target_type"])
+            for _, x in v["private_link"] : x["target_type"] == null ? true : contains(["blob", "blob_secondary", "web", "sites", "Gateway", "managedEnvironments", "web_secondary"], x["target_type"])
           ]
         )
       ]
     )
-    error_message = "Possible values are 'blob', 'blob_secondary', 'web' and 'sites'. Set it to 'null' for Load balancer as origin"
+    error_message = "Possible values are 'blob', 'blob_secondary', 'web', 'sites', 'Gateway', 'managedEnvironments' and 'web_secondary'. Set it to 'null' for Load balancer as origin"
   }
 }
 
@@ -1932,7 +1932,7 @@ variable "front_door_rules" {
     error_message = "The header_action for response_header_actions must be either 'Append', 'Delete' or 'Overwrite'."
   }
   validation {
-    condition     = alltrue([for _, v in var.front_door_rules : v.actions.response_header_actions != null ? alltrue([for _, x in v.actions.response_header_actions : contains(["Append", "Delete"], x.header_action) ? x.value != null : true]) : true])
+    condition     = alltrue([for _, v in var.front_door_rules : v.actions.response_header_actions != null ? alltrue([for _, x in v.actions.response_header_actions : contains(["Append", "Overwrite"], x.header_action) ? x.value != null : true]) : true])
     error_message = "The value is required if the header_action is set to 'Append' or 'Overwrite'."
   }
   validation {
@@ -1940,7 +1940,7 @@ variable "front_door_rules" {
     error_message = "The header_action for request_header_actions must be either 'Append', 'Delete' or 'Overwrite'."
   }
   validation {
-    condition     = alltrue([for _, v in var.front_door_rules : v.actions.request_header_actions != null ? alltrue([for _, x in v.actions.request_header_actions : contains(["Append", "Delete"], x.header_action) ? x.value != null : true]) : true])
+    condition     = alltrue([for _, v in var.front_door_rules : v.actions.request_header_actions != null ? alltrue([for _, x in v.actions.request_header_actions : contains(["Append", "Overwrite"], x.header_action) ? x.value != null : true]) : true])
     error_message = "The value is required if the header_action is set to 'Append' or 'Overwrite'."
   }
   validation {

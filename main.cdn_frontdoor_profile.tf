@@ -1,6 +1,9 @@
 # using azapi since azurerm_cdn_frontdoor_profile commented above does not support identity blocks
 resource "azapi_resource" "front_door_profile" {
-  type = "Microsoft.Cdn/profiles@2023-07-01-preview"
+  location  = "Global"
+  name      = var.name
+  parent_id = data.azurerm_resource_group.rg.id
+  type      = "Microsoft.Cdn/profiles@2023-07-01-preview"
   body = {
     properties = {
       originResponseTimeoutSeconds = var.response_timeout_seconds
@@ -9,9 +12,6 @@ resource "azapi_resource" "front_door_profile" {
       name = var.sku
     }
   }
-  location                  = "Global"
-  name                      = var.name
-  parent_id                 = data.azurerm_resource_group.rg.id
   schema_validation_enabled = false
   tags                      = var.tags
 
